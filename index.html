@@ -11,6 +11,9 @@
     <div class="hero__overlay"></div>
     <nav class="top-nav">
       <div class="brand">Limitless Grace</div>
+      <button class="nav-toggle" aria-label="Menu" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
       <div class="nav-links">
         <a href="#histoire">Notre histoire</a>
         <a href="#jours">Les grands jours</a>
@@ -165,9 +168,20 @@
         <p class="eyebrow">Moments</p>
         <h2>En images</h2>
       </div>
-      <div class="gallery__grid">
-        <img src="Ok.png" alt="Couple posant ensemble" class="gallery__item">
-        <img src="Ok-1.png" alt="Couple souriant" class="gallery__item wide">
+      <div class="carousel">
+        <div class="carousel__track">
+          <img src="Ok.png" alt="Couple posant ensemble" class="carousel__slide">
+          <img src="Ok-1.png" alt="Couple souriant" class="carousel__slide">
+          <img src="photos/ph_d1.jpeg" alt="Photo 1" class="carousel__slide">
+          <img src="photos/ph_d2.jpeg" alt="Photo 2" class="carousel__slide">
+          <img src="photos/ph_d3.jpeg" alt="Photo 3" class="carousel__slide">
+          <img src="photos/ph_d4.jpeg" alt="Photo 4" class="carousel__slide">
+          <img src="photos/ph_d5.jpeg" alt="Photo 5" class="carousel__slide">
+          <img src="photos/ph_d6.jpeg" alt="Photo 6" class="carousel__slide">
+        </div>
+        <button class="carousel__btn carousel__btn--prev" aria-label="Photo précédente">&#8249;</button>
+        <button class="carousel__btn carousel__btn--next" aria-label="Photo suivante">&#8250;</button>
+        <div class="carousel__dots"></div>
       </div>
     </section>
   </main>
@@ -245,6 +259,10 @@
             <label class="field">
               <span>Contact (WhatsApp) *</span>
               <input type="tel" name="contact" placeholder="+228 ou +33 ..." autocomplete="tel" required>
+            </label>
+            <label class="field">
+              <span>Email *</span>
+              <input type="email" name="email" placeholder="votre@email.com" autocomplete="email" required>
             </label>
           </div>
         </fieldset>
@@ -349,6 +367,68 @@
   <iframe id="formTarget" name="formTarget" class="hidden-frame"></iframe>
 
   <script>
+    // Mobile nav toggle
+    const navToggle = document.querySelector('.nav-toggle');
+    const navLinks = document.querySelector('.nav-links');
+    navToggle.addEventListener('click', () => {
+      const open = navLinks.classList.toggle('open');
+      navToggle.classList.toggle('open', open);
+      navToggle.setAttribute('aria-expanded', open);
+    });
+    navLinks.querySelectorAll('a').forEach(a => {
+      a.addEventListener('click', () => {
+        navLinks.classList.remove('open');
+        navToggle.classList.remove('open');
+        navToggle.setAttribute('aria-expanded', 'false');
+      });
+    });
+
+    // Carousel
+    (function() {
+      const track = document.querySelector('.carousel__track');
+      const slides = document.querySelectorAll('.carousel__slide');
+      const dotsContainer = document.querySelector('.carousel__dots');
+      const prevBtn = document.querySelector('.carousel__btn--prev');
+      const nextBtn = document.querySelector('.carousel__btn--next');
+      let current = 0;
+      let autoTimer;
+
+      slides.forEach((_, i) => {
+        const dot = document.createElement('button');
+        dot.className = 'carousel__dot' + (i === 0 ? ' active' : '');
+        dot.setAttribute('aria-label', 'Photo ' + (i + 1));
+        dot.addEventListener('click', () => goTo(i));
+        dotsContainer.appendChild(dot);
+      });
+
+      const dots = dotsContainer.querySelectorAll('.carousel__dot');
+
+      function goTo(index) {
+        current = (index + slides.length) % slides.length;
+        track.style.transform = 'translateX(-' + (current * 100) + '%)';
+        dots.forEach((d, i) => d.classList.toggle('active', i === current));
+        resetAuto();
+      }
+
+      prevBtn.addEventListener('click', () => goTo(current - 1));
+      nextBtn.addEventListener('click', () => goTo(current + 1));
+
+      function resetAuto() {
+        clearInterval(autoTimer);
+        autoTimer = setInterval(() => goTo(current + 1), 5000);
+      }
+      resetAuto();
+
+      // Swipe support
+      let startX = 0;
+      const carousel = document.querySelector('.carousel');
+      carousel.addEventListener('touchstart', (e) => { startX = e.touches[0].clientX; }, { passive: true });
+      carousel.addEventListener('touchend', (e) => {
+        const diff = startX - e.changedTouches[0].clientX;
+        if (Math.abs(diff) > 40) goTo(current + (diff > 0 ? 1 : -1));
+      });
+    })();
+
     const modal = document.getElementById('rsvpModal');
     const giftModal = document.getElementById('giftModal');
     const form = document.getElementById('rsvpForm');
@@ -428,6 +508,7 @@
         nom: form.nom.value.trim(),
         prenoms: form.prenoms.value.trim(),
         contact: form.contact.value.trim(),
+        email: form.email.value.trim(),
         presence: events.map(ev => ev.value).join(', '),
         logement: form.logement.value,
         invitation: form.envoyepar.value,
@@ -437,7 +518,7 @@
         dateDepart: form.depart.value
       };
 
-      fetch('https://script.google.com/macros/s/AKfycbxI1MWhW-Z597c8dyQODvNDdMAg6amq73FhgZeQ3WiuU3TA1n8sq5WUIehcvXnD8_mK/exec', {
+      fetch('https://script.google.com/macros/s/AKfycbysvbRzyk2vt65-2o6scKbQJh1xsaaBwhDLx91Xl4rKV0_TUZVvSfBRWvrEEJyUmxRx/exec', {
         method: 'POST',
         mode: 'no-cors',
         headers: { 'Content-Type': 'application/json' },
