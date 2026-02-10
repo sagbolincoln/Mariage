@@ -408,6 +408,14 @@ img {
   color: var(--muted);
 }
 
+.lodging__note {
+  text-align: center;
+  font-size: 0.85rem;
+  color: var(--muted);
+  margin-top: 16px;
+  font-style: italic;
+}
+
 .gift {
   padding: 0 6vw 72px;
 }
