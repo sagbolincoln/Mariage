@@ -189,6 +189,16 @@ img {
   transform: translateY(-2px);
 }
 
+.btn.gold {
+  background: linear-gradient(135deg, var(--gold) 0%, #c4912e 100%);
+  color: #fff;
+  box-shadow: 0 12px 30px rgba(215, 162, 74, 0.3);
+}
+
+.btn.gold:hover {
+  transform: translateY(-2px);
+}
+
 .btn.ghost {
   background: rgba(255, 255, 255, 0.12);
   color: var(--olive-deep);
